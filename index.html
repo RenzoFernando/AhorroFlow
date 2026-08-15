@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AhorroFlow es una aplicación web para crear y seguir planes de ahorro incremental basados en aportes progresivos.">
     <title>AhorroFlow - Tu Meta Financiera</title>
     <!-- Tailwind CSS (CDN para desarrollo rápido, puedes instalarlo localmente después) -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,157 +12,196 @@
     <!-- Google Fonts: Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Tu Hoja de Estilos -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="web/style.css">
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 </head>
-<body class="flex flex-col items-center justify-center p-4 h-screen relative overflow-hidden">
+<body>
 
 <!-- Elementos decorativos de fondo -->
-<div class="bg-blob bg-purple-300 w-64 h-64 rounded-full top-5 left-5 animate-pulse"></div>
-<div class="bg-blob bg-yellow-200 w-72 h-72 rounded-full bottom-10 right-5 animate-pulse" style="animation-delay: 2s;"></div>
 
 <!-- Contenedor Principal (Más compacto: max-w-sm en lugar de md) -->
-<main class="w-full max-w-sm h-full max-h-[850px] glass-panel rounded-2xl shadow-2xl flex flex-col overflow-hidden relative border border-white/40">
+<main class="app-shell">
 
     <!-- Header Compacto -->
-    <header class="pt-5 pb-3 px-5 text-center relative z-10 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-            <div class="inline-flex items-center justify-center w-8 h-8 bg-gradient-to-tr from-emerald-400 to-cyan-500 rounded-lg text-white shadow-md">
-                <i class="fas fa-wallet text-sm"></i>
-            </div>
-            <div class="text-left">
-                <h1 class="text-lg font-bold text-gray-800 leading-tight">AhorroFlow</h1>
-                <p class="text-[10px] text-gray-500 font-medium">Tu meta, paso a paso</p>
-            </div>
+    <header class="app-header">
+        <a class="brand" href="./" aria-label="AhorroFlow — Tu meta, paso a paso">
+            <span class="brand-icon">
+                <img src="assets/favicon.ico" alt="">
+            </span>
+            <span class="brand-copy">
+                <span class="brand-name">AhorroFlow</span>
+                <span class="brand-subtitle">Tu meta, paso a paso</span>
+            </span>
+        </a>
+
+        <div class="header-actions">
+            <button class="secondary-button" id="clear-progress-button" type="button">
+                <i class="fas fa-eraser" aria-hidden="true"></i>
+                <span>Limpiar</span>
+            </button>
+
+            <!-- Botón Configuración en el Header para ahorrar espacio -->
+            <button class="icon-button" onclick="openModal()" type="button" aria-label="Configurar plan">
+                <i class="fas fa-sliders-h" aria-hidden="true"></i>
+            </button>
         </div>
-        <!-- Botón Configuración en el Header para ahorrar espacio -->
-        <button onclick="openModal()" class="w-8 h-8 rounded-full bg-white/50 hover:bg-white flex items-center justify-center shadow-sm transition text-gray-600 border border-white/60">
-            <i class="fas fa-sliders-h text-xs"></i>
-        </button>
     </header>
 
-    <!-- Dashboard de Progreso Compacto -->
-    <div class="px-5 mb-3">
-        <div class="bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl p-4 text-white shadow-lg relative overflow-hidden group">
-            <!-- Brillo decorativo -->
-            <div class="absolute top-0 right-0 w-20 h-20 bg-white/5 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2"></div>
+    <div class="app-content">
+        <aside class="summary-column">
+            <!-- Dashboard de Progreso Compacto -->
+            <section class="summary-card" aria-label="Resumen del plan">
+                <!-- Brillo decorativo -->
 
-            <div class="flex justify-between items-end mb-3">
+                <div class="summary-top">
+                    <div>
+                        <p class="eyebrow">Total ahorrado</p>
+                        <h2 id="display-saved">$0</h2>
+                    </div>
+
+                    <div class="goal-copy">
+                        <p class="eyebrow">Meta</p>
+                        <p id="display-goal">$100.000</p>
+                    </div>
+                </div>
+
+                <!-- Barra -->
+                <div class="progress-track" aria-hidden="true">
+                    <div id="progress-bar" class="progress-bar-fill" style="width: 0%"></div>
+                </div>
+
+                <div class="progress-meta">
+                    <span id="progress-text">0%</span>
+                    <span id="days-left-text">Calculando...</span>
+                </div>
+            </section>
+
+        </aside>
+
+        <section class="history-panel">
+            <!-- Título de lista sutil -->
+            <div class="history-heading">
                 <div>
-                    <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-0.5">Total Ahorrado</p>
-                    <h2 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-100" id="display-saved">$0</h2>
-                </div>
-                <div class="text-right">
-                    <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Meta</p>
-                    <p class="text-sm font-medium text-gray-300" id="display-goal">$100.000</p>
+                    <h3>Historial diario</h3>
+                    <p id="history-summary">Sin movimientos todavía.</p>
                 </div>
             </div>
 
-            <!-- Barra -->
-            <div class="relative w-full h-2.5 bg-gray-700/50 rounded-full overflow-hidden backdrop-blur-sm">
-                <div id="progress-bar" class="absolute top-0 left-0 h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full progress-bar-fill shadow-[0_0_10px_rgba(16,185,129,0.5)]" style="width: 0%"></div>
+            <!-- Lista de Scroll (Items más pequeños) -->
+            <div class="savings-list custom-scrollbar" id="savings-list">
+                <!-- Items generados dinámicamente -->
             </div>
-            <div class="flex justify-between mt-1.5 text-[10px] text-gray-400 font-medium">
-                <span id="progress-text">0%</span>
-                <span id="days-left-text">Calculando...</span>
-            </div>
-        </div>
+        </section>
     </div>
-
-    <!-- Título de lista sutil -->
-    <div class="px-5 pb-2 border-b border-gray-100/50 mb-1">
-        <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Historial Diario</h3>
-    </div>
-
-    <!-- Lista de Scroll (Items más pequeños) -->
-    <div class="flex-1 overflow-y-auto px-4 pb-4 space-y-2 custom-scrollbar" id="savings-list">
-        <!-- Items generados dinámicamente -->
-    </div>
-
-    <!-- Footer Legal Minimalista -->
-    <footer class="py-2 text-center border-t border-gray-200/30 bg-white/40 backdrop-blur-md text-[9px] text-gray-500">
-        <p>&copy; 2026 - Renzo Fernando Mosquera Daza. Todos los derechos reservados.</p>
-    </footer>
 
 </main>
 
+<!-- Footer Legal Minimalista -->
+<footer class="project-footer">
+    <p><a href="https://github.com/RenzoFernando/AhorroFlow" target="_blank" rel="noopener noreferrer"><strong>AhorroFlow</strong></a> — Planificación de metas de ahorro</p>
+    <p>© 2026 — Renzo Fernando Mosquera Daza</p>
+</footer>
+
 <!-- Modal de Configuración (Overlay) -->
-<div id="config-modal" class="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-50 hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-    <div class="bg-white/95 backdrop-blur-xl rounded-2xl w-full max-w-xs p-5 shadow-2xl transform scale-95 transition-transform duration-300 border border-white/50" id="modal-content">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-bold text-gray-800">Tu Plan</h3>
-            <button onclick="closeModal()" class="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition">
-                <i class="fas fa-times text-xs"></i>
+<div id="config-modal" class="config-modal hidden">
+    <div class="config-card" id="modal-content" role="dialog" aria-modal="true" aria-labelledby="config-title">
+        <div class="config-header">
+            <div>
+                <span class="config-kicker">Configuración</span>
+                <h3 id="config-title">Tu plan</h3>
+            </div>
+            <button onclick="closeModal()" class="modal-close" type="button" aria-label="Cerrar configuración">
+                <i class="fas fa-times" aria-hidden="true"></i>
             </button>
         </div>
 
-        <div class="space-y-3">
-            <div class="bg-gray-50 p-2.5 rounded-lg border border-gray-200/60 focus-within:border-emerald-400 focus-within:ring-1 focus-within:ring-emerald-400/20 transition-all">
-                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Fecha Inicio</label>
-                <input type="date" id="start-date" class="w-full bg-transparent text-sm font-semibold text-gray-700 outline-none">
+        <div class="config-fields">
+            <label class="field-card">
+                <span>Fecha inicio</span>
+                <input type="date" id="start-date">
+            </label>
+
+            <div class="field-grid">
+                <label class="field-card">
+                    <span>Base ($)</span>
+                    <input type="number" id="base-amount" min="0" step="100" placeholder="500">
+                </label>
+
+                <label class="field-card">
+                    <span>+ Diario ($)</span>
+                    <input type="number" id="increment-amount" min="0" step="100" placeholder="500">
+                </label>
             </div>
 
-            <div class="grid grid-cols-2 gap-2">
-                <div class="bg-gray-50 p-2.5 rounded-lg border border-gray-200/60">
-                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Base ($)</label>
-                    <input type="number" id="base-amount" class="w-full bg-transparent text-sm font-semibold text-gray-700 outline-none" placeholder="500">
-                </div>
-                <div class="bg-gray-50 p-2.5 rounded-lg border border-gray-200/60">
-                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">+ Diario ($)</label>
-                    <input type="number" id="increment-amount" class="w-full bg-transparent text-sm font-semibold text-gray-700 outline-none" placeholder="500">
-                </div>
-            </div>
+            <label class="field-card">
+                <span>Meta total ($)</span>
+                <input type="number" id="target-goal" min="1" step="1000" placeholder="100000">
+            </label>
 
-            <div class="bg-gray-50 p-2.5 rounded-lg border border-gray-200/60">
-                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Meta Total ($)</label>
-                <input type="number" id="target-goal" class="w-full bg-transparent font-bold text-emerald-600 text-base outline-none" placeholder="100000">
-            </div>
-
-            <div>
-                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2">Días Hábiles</label>
-                <div class="flex justify-between gap-1">
+            <div class="days-field">
+                <span>Días hábiles</span>
+                <div class="days-grid">
                     <!-- Botones de días estilizados -->
-                    <label class="cursor-pointer flex-1">
-                        <input type="checkbox" class="peer sr-only day-check" value="1" checked>
-                        <span class="w-full aspect-square flex items-center justify-center rounded-lg text-[10px] font-bold bg-gray-100 text-gray-400 peer-checked:bg-emerald-500 peer-checked:text-white transition-all hover:bg-gray-200">L</span>
+                    <label>
+                        <input type="checkbox" class="day-check" value="1" checked>
+                        <span>L</span>
                     </label>
-                    <label class="cursor-pointer flex-1">
-                        <input type="checkbox" class="peer sr-only day-check" value="2" checked>
-                        <span class="w-full aspect-square flex items-center justify-center rounded-lg text-[10px] font-bold bg-gray-100 text-gray-400 peer-checked:bg-emerald-500 peer-checked:text-white transition-all hover:bg-gray-200">M</span>
+                    <label>
+                        <input type="checkbox" class="day-check" value="2" checked>
+                        <span>M</span>
                     </label>
-                    <label class="cursor-pointer flex-1">
-                        <input type="checkbox" class="peer sr-only day-check" value="3" checked>
-                        <span class="w-full aspect-square flex items-center justify-center rounded-lg text-[10px] font-bold bg-gray-100 text-gray-400 peer-checked:bg-emerald-500 peer-checked:text-white transition-all hover:bg-gray-200">X</span>
+                    <label>
+                        <input type="checkbox" class="day-check" value="3" checked>
+                        <span>X</span>
                     </label>
-                    <label class="cursor-pointer flex-1">
-                        <input type="checkbox" class="peer sr-only day-check" value="4" checked>
-                        <span class="w-full aspect-square flex items-center justify-center rounded-lg text-[10px] font-bold bg-gray-100 text-gray-400 peer-checked:bg-emerald-500 peer-checked:text-white transition-all hover:bg-gray-200">J</span>
+                    <label>
+                        <input type="checkbox" class="day-check" value="4" checked>
+                        <span>J</span>
                     </label>
-                    <label class="cursor-pointer flex-1">
-                        <input type="checkbox" class="peer sr-only day-check" value="5" checked>
-                        <span class="w-full aspect-square flex items-center justify-center rounded-lg text-[10px] font-bold bg-gray-100 text-gray-400 peer-checked:bg-emerald-500 peer-checked:text-white transition-all hover:bg-gray-200">V</span>
+                    <label>
+                        <input type="checkbox" class="day-check" value="5" checked>
+                        <span>V</span>
                     </label>
-                    <label class="cursor-pointer flex-1">
-                        <input type="checkbox" class="peer sr-only day-check" value="6">
-                        <span class="w-full aspect-square flex items-center justify-center rounded-lg text-[10px] font-bold bg-gray-100 text-gray-400 peer-checked:bg-emerald-500 peer-checked:text-white transition-all hover:bg-gray-200">S</span>
+                    <label>
+                        <input type="checkbox" class="day-check" value="6">
+                        <span>S</span>
                     </label>
-                    <label class="cursor-pointer flex-1">
-                        <input type="checkbox" class="peer sr-only day-check" value="0">
-                        <span class="w-full aspect-square flex items-center justify-center rounded-lg text-[10px] font-bold bg-gray-100 text-gray-400 peer-checked:bg-emerald-500 peer-checked:text-white transition-all hover:bg-gray-200">D</span>
+                    <label>
+                        <input type="checkbox" class="day-check" value="0">
+                        <span>D</span>
                     </label>
                 </div>
             </div>
 
-            <button onclick="generatePlan()" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-bold rounded-xl shadow-lg hover:shadow-emerald-500/30 transform hover:-translate-y-0.5 active:scale-95 transition-all mt-2">
-                Generar Nuevo Plan
+            <button onclick="generatePlan()" class="primary-button" type="button">
+                Generar nuevo plan
             </button>
-            <p class="text-center text-[9px] text-gray-400">⚠️ Reiniciará el progreso actual</p>
+            <p class="reset-note">Reemplazará el plan actual y reiniciará su progreso.</p>
+        </div>
+    </div>
+</div>
+
+
+<div id="notice-modal" class="notice-modal hidden" aria-hidden="true">
+    <div class="notice-card" id="notice-card" role="dialog" aria-modal="true" aria-labelledby="notice-title" aria-describedby="notice-message">
+        <div class="notice-icon" id="notice-icon" aria-hidden="true">
+            <i class="fas fa-circle-info"></i>
+        </div>
+
+        <div class="notice-copy">
+            <h3 id="notice-title">Aviso</h3>
+            <p id="notice-message"></p>
+        </div>
+
+        <div class="notice-actions">
+            <button class="notice-secondary hidden" id="notice-cancel-button" type="button">Cancelar</button>
+            <button class="notice-primary" id="notice-confirm-button" type="button">Aceptar</button>
         </div>
     </div>
 </div>
 
 <!-- Tu Lógica JS -->
-<script src="script.js"></script>
+<script src="web/script.js"></script>
 </body>
 </html>
